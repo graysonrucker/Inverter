@@ -8,7 +8,7 @@ ChordCompute is a full-stack web application for generating and browsing every v
 
 ## What It Does
 
-Select any combination of notes on the interactive piano keyboard and click **Generate**. Inverter computes all voicings of that chord across your selected keyboard range, preserving the exact pitch class multiplicity of your input — a C major triad with one C, one E, and one G will only return voicings containing exactly one of each. Results are deduplicated by interval structure, paginated, and displayed as mini piano diagrams.
+Select any combination of notes on the interactive piano keyboard and click **Generate**. Inverter computes all voicings of that chord across your selected keyboard range, preserving the exact pitch class multiplicity of your input, a C major triad with one C, one E, and one G will only return voicings containing exactly one of each. Results are deduplicated by interval structure, paginated, and displayed as mini piano diagrams.
 
 Results are browsable immediately during generation for large jobs.
 
@@ -34,7 +34,7 @@ The core algorithm is written in C++ and compiled to WebAssembly. Given an input
 
 Generation runs as a background job in a `worker_threads` worker. The server returns a `jobId` immediately; the client polls status and pages results without blocking.
 
-For large chords (estimated 50M+ candidate voicings), the engine switches to **span mode**: 88 passes — one per semitone span — distributed across a pool of parallel span workers, each owning its own WASM instance. Running one span at a time keeps peak memory flat, since the deduplication hash set only needs to hold the voicings for a single span rather than the entire result set. Results are committed to disk span-by-span using zstd-compressed frame-indexed binary files, so the client can begin paging results before generation is complete.
+For large chords (estimated 50M+ candidate voicings), the engine switches to **span mode**: 88 passes, one per semitone span, distributed across a pool of parallel span workers, each owning its own WASM instance. Running one span at a time keeps peak memory flat, since the deduplication hash set only needs to hold the voicings for a single span rather than the entire result set. Results are committed to disk span-by-span using zstd-compressed frame-indexed binary files, so the client can begin paging results before generation is complete.
 
 For smaller chords, a single-pass mode buckets voicings by span on the fly before writing a sorted output file.
 
